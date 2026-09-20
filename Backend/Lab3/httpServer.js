@@ -47,7 +47,19 @@ const server = http.createServer((req,res)=>{
         res.end(JSON.stringify(user));
     } 
 
+    else if(url.startsWith("/delete/") && method == "DELETE"){
+        const id = url.split("/")[2];
+        const idx = userdata.findIndex((u) => u.id == id);
+        if(idx == -1){
+            return res.end("Data not found");
+        }
+        userdata.splice(idx , 1);
+        res.end("Data deleted successfully");
+    }
+
 });
 server.listen(4000,()=>{
     console.log("server is running on port number 4000");
 });
+//we have ho update email (by method == put);
+//post ke through data lana hai
