@@ -1,56 +1,61 @@
+
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserSignup = () => {
+    const navigate = useNavigate();
 
     const [user, setUser] = useState({
         userId: "",
         name: "",
-        email: ""
+        email: "",
+        password: ""
     });
 
     const handleChange = (e) => {
         setUser({
-            ...user, // Spread operator used to copy the data  to change
+            ...user,
             [e.target.name]: e.target.value
         });
     };
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    try {
-        const response = await fetch("http://localhost:4010/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                id: user.userId,
-                name: user.name,
-                email: user.email
-            })
-        });
+        try {
+            const response = await axios.post(
+                "http://localhost:4010/create",
+                {
+                    id: user.userId,
+                    name: user.name,
+                    email: user.email,
+                    password: user.password
+                }
+            );
 
-        const data = await response.json();
-
-        if (response.ok) {
-            console.log("Response:", data);
+            console.log("Response:", response.data);
             alert("User created successfully!");
+            navigate("/dashboard");
 
             setUser({
                 userId: "",
                 name: "",
-                email: ""
+                email: "",
+                password: ""
             });
-        } else {
-            alert("Failed to create user");
-        }
 
-    } catch (error) {
-        console.error("Error:", error);
-        alert("Backend server se connect nahi ho pa raha");
-    }
-};
+        } catch (error) {
+            console.error("Error:", error);
+
+            if (error.response) {
+                console.log("Backend Error:", error.response.data);
+                alert("Failed to create user");
+            } else {
+                alert("Backend is not connecting to server");
+            }
+        }
+    };
 
     const handleSave = () => {
         console.log("Saved:", user);
@@ -61,7 +66,8 @@ const UserSignup = () => {
         setUser({
             userId: "",
             name: "",
-            email: ""
+            email: "",
+            password: ""
         });
     };
 
@@ -136,11 +142,15 @@ const UserSignup = () => {
                 <div className="signup-box">
 
                     <h1>Sign Up</h1>
-                    <p className="subtitle">Create your account</p>
+
+                    <p className="subtitle">
+                        Create your account
+                    </p>
 
                     <form onSubmit={handleSubmit}>
 
                         <label>User ID</label>
+
                         <input
                             type="text"
                             name="userId"
@@ -150,6 +160,7 @@ const UserSignup = () => {
                         />
 
                         <label>Name</label>
+
                         <input
                             type="text"
                             name="name"
@@ -159,6 +170,7 @@ const UserSignup = () => {
                         />
 
                         <label>Email</label>
+
                         <input
                             type="email"
                             name="email"
@@ -167,16 +179,37 @@ const UserSignup = () => {
                             placeholder="Enter Email"
                         />
 
-                        <div className="buttons">
-                            <button type="submit">Submit</button>
+                        <label>Password</label>
 
-                            <button type="button" onClick={handleSave}>
+                        <input
+                            type="password"
+                            name="password"
+                            value={user.password}
+                            onChange={handleChange}
+                            placeholder="Create Password"
+                            required
+                        />
+
+                        <div className="buttons">
+
+                            <button type="submit">
+                                Submit
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleSave}
+                            >
                                 Save
                             </button>
 
-                            <button type="button" onClick={handleReset}>
+                            <button
+                                type="button"
+                                onClick={handleReset}
+                            >
                                 Reset
                             </button>
+
                         </div>
 
                     </form>
